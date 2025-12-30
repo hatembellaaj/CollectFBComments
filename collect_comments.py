@@ -11,7 +11,7 @@ import json
 import re
 import sys
 from dataclasses import dataclass
-from typing import Iterable, List, Optional
+from typing import IO, Iterable, List, Optional, Union
 from urllib.error import HTTPError
 from urllib.parse import parse_qs, urlencode, urlparse
 from urllib.request import Request, urlopen
@@ -131,7 +131,9 @@ def extract_post_id(post_url: str) -> str:
     )
 
 
-def save_comments_to_csv(comments: Iterable[Comment], output_path: str) -> None:
+def save_comments_to_csv(
+    comments: Iterable[Comment], output: Union[str, IO[str]]
+) -> None:
     fieldnames = [
         "comment_id",
         "created_time",
@@ -142,8 +144,17 @@ def save_comments_to_csv(comments: Iterable[Comment], output_path: str) -> None:
         "like_count",
     ]
 
-    with open(output_path, "w", newline="", encoding="utf-8") as csv_file:
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    handle: Optional[IO[str]] = None
+    close_handle = False
+
+    if hasattr(output, "write"):
+        handle = output  # type: ignore[assignment]
+    else:
+        handle = open(output, "w", newline="", encoding="utf-8")
+        close_handle = True
+
+    try:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         for comment in comments:
             writer.writerow(
@@ -157,6 +168,9 @@ def save_comments_to_csv(comments: Iterable[Comment], output_path: str) -> None:
                     "like_count": comment.like_count,
                 }
             )
+    finally:
+        if close_handle and handle is not None:
+            handle.close()
 
 
 def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:

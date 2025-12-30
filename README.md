@@ -1,6 +1,6 @@
 # CollectFBComments
 
-Un petit script Python en ligne de commande pour récupérer les commentaires d'une publication Facebook via l'API Graph.
+Un petit script Python en ligne de commande pour récupérer les commentaires d'une publication Facebook via l'API Graph. Une interface web simplifiée est également disponible (port 8060) pour déclencher la collecte et télécharger le CSV.
 
 ## Prérequis
 - Python 3.9+
@@ -11,7 +11,7 @@ Un petit script Python en ligne de commande pour récupérer les commentaires d'
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-# Aucune installation de package n'est nécessaire
+pip install -r requirements.txt
 ```
 
 ## Utilisation
@@ -28,3 +28,21 @@ La commande affiche les 10 premiers commentaires dans le terminal et écrit l'en
 
 ## Champs exportés
 Le CSV comporte les colonnes suivantes : `comment_id`, `created_time`, `author_id`, `author_name`, `message`, `parent_id`, `like_count`.
+
+## Interface web (port 8060)
+
+```bash
+export FLASK_APP=app.py
+flask run --host 0.0.0.0 --port 8060
+```
+
+Ouvrez ensuite http://localhost:8060 et renseignez l'URL de la publication ainsi que votre jeton. Les 10 premiers commentaires sont affichés, et un bouton permet de télécharger le CSV généré.
+
+## Docker
+
+Une image Docker prête à l'emploi expose l'interface web sur le port 8060.
+
+```bash
+docker build -t collect-fb-comments .
+docker run --rm -p 8060:8060 collect-fb-comments
+```

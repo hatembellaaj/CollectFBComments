@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Collecteur de commentaires Facebook</title>
+    <style>
+      :root {
+        font-family: system-ui, -apple-system, sans-serif;
+        color: #0f172a;
+        background-color: #f8fafc;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background: #0f172a;
+        color: white;
+        padding: 1.25rem 1rem;
+        text-align: center;
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+      form {
+        display: grid;
+        gap: 1rem;
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      }
+      label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 0.35rem;
+      }
+      input, textarea, button, select {
+        width: 100%;
+        padding: 0.65rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+      button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 150ms ease-in-out;
+        font-weight: 700;
+      }
+      button:hover {
+        background: #1d4ed8;
+      }
+      .grid {
+        display: grid;
+        gap: 1rem;
+      }
+      .two-cols {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+      .error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecdd3;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+      }
+      .preview {
+        margin-top: 1.5rem;
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      }
+      .comment {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.75rem 0;
+      }
+      .comment:last-child {
+        border-bottom: none;
+      }
+      .meta {
+        font-size: 0.9rem;
+        color: #475569;
+      }
+      .download {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        text-decoration: none;
+        background: #059669;
+        color: white;
+        padding: 0.65rem 0.9rem;
+        border-radius: 8px;
+        font-weight: 700;
+        margin-top: 0.75rem;
+      }
+      .download:hover {
+        background: #047857;
+      }
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Collecteur de commentaires Facebook</h1>
+      <p>Interface web pour exporter les commentaires d'une publication vers CSV</p>
+    </header>
+    <main>
+      <form method="post">
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        <div class="grid two-cols">
+          <div>
+            <label for="post_url">URL de la publication *</label>
+            <input type="url" id="post_url" name="post_url" required value="{{ form.post_url }}" placeholder="https://www.facebook.com/..." />
+          </div>
+          <div>
+            <label for="access_token">Jeton d'accès Graph API *</label>
+            <input type="text" id="access_token" name="access_token" required value="{{ form.access_token }}" placeholder="EAAC..." />
+          </div>
+        </div>
+        <div class="grid two-cols">
+          <div>
+            <label for="post_id">Identifiant du post (optionnel)</label>
+            <input type="text" id="post_id" name="post_id" value="{{ form.post_id }}" placeholder="123456_78910" />
+          </div>
+          <div>
+            <label for="api_version">Version de l'API</label>
+            <input type="text" id="api_version" name="api_version" value="{{ form.api_version }}" placeholder="v19.0" />
+          </div>
+        </div>
+        <div class="grid two-cols">
+          <div>
+            <label for="csv_name">Nom du fichier CSV</label>
+            <input type="text" id="csv_name" name="csv_name" value="{{ csv_name }}" />
+          </div>
+        </div>
+        <button type="submit">Récupérer les commentaires</button>
+      </form>
+
+      {% if preview %}
+      <div class="preview">
+        <h2>Prévisualisation ({{ preview|length }} / {{ comment_count }} commentaires)</h2>
+        <p>Les 10 premiers commentaires sont affichés ci-dessous.</p>
+        <div>
+          {% for comment in preview %}
+          <div class="comment">
+            <div class="meta">{{ comment.author_name or 'Auteur inconnu' }} • {{ comment.created_time }}</div>
+            <div>{{ comment.message }}</div>
+            {% if comment.like_count is not none %}
+            <div class="meta">👍 {{ comment.like_count }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% if csv_content %}
+        <a class="download" href="data:text/csv;charset=utf-8,{{ csv_content|urlencode }}" download="{{ csv_name }}">Télécharger le CSV</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </main>
+  </body>
+</html>

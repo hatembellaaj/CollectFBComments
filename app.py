@@ -2,8 +2,11 @@
 from __future__ import annotations
 
 import io
+import os
+from typing import Optional
 
 from flask import Flask, render_template, request
+from werkzeug.serving import generate_adhoc_ssl_context
 
 from collect_comments import CommentCollector, extract_post_id, save_comments_to_csv
 
@@ -93,5 +96,29 @@ def collect_comments():
     )
 
 
+def _ssl_context() -> Optional[object]:
+    """Build an SSL context when HTTPS is requested.
+
+    - If ``SSL_CERT_FILE`` and ``SSL_KEY_FILE`` are provided, use them as-is.
+    - If ``USE_HTTPS`` is truthy, generate an ad-hoc certificate (requires
+      ``cryptography``).
+    - Otherwise, return ``None`` so Flask serves plain HTTP.
+    """
+
+    cert_file = os.getenv("SSL_CERT_FILE")
+    key_file = os.getenv("SSL_KEY_FILE")
+    if cert_file and key_file:
+        return cert_file, key_file
+
+    if os.getenv("USE_HTTPS", "").strip().lower() in {"1", "true", "yes"}:
+        try:
+            return generate_adhoc_ssl_context()
+        except Exception as exc:  # noqa: BLE001 - surface configuration errors
+            print(f"Unable to enable HTTPS, falling back to HTTP: {exc}")
+
+    return None
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8060)
+    port = int(os.getenv("PORT", "8060"))
+    app.run(host="0.0.0.0", port=port, ssl_context=_ssl_context())

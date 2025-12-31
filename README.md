@@ -38,6 +38,11 @@ flask run --host 0.0.0.0 --port 8060
 
 Ouvrez ensuite http://localhost:8060 et renseignez l'URL de la publication ainsi que votre jeton. Les 10 premiers commentaires sont affichés, et un bouton permet de télécharger le CSV généré.
 
+Pour accepter des connexions HTTPS (utile si votre navigateur force le chiffrement), vous pouvez :
+
+- fournir vos propres fichiers de certificat et de clé via `SSL_CERT_FILE` et `SSL_KEY_FILE`, ou
+- définir `USE_HTTPS=1` pour générer automatiquement un certificat de développement (dépend de la bibliothèque `cryptography`).
+
 ## Docker
 
 Une image Docker prête à l'emploi expose l'interface web sur le port 8060.

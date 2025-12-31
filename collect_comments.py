@@ -51,8 +51,32 @@ class CommentCollector:
                 charset = response.headers.get_content_charset() or "utf-8"
                 payload = response.read().decode(charset)
         except HTTPError as exc:
-            # Match the requests.HTTPError API used in the CLI for simplicity
-            raise
+            # Surface the Graph API error message when available instead of a generic 400
+            # so the UI/CLI can display actionable feedback.
+            error_detail = exc.reason or "HTTP Error"
+
+            try:
+                body = exc.read() or b""
+                # The Graph API returns a JSON payload with an "error" object when possible.
+                if body:
+                    decoded_body = body.decode("utf-8", errors="replace")
+                    try:
+                        parsed = json.loads(decoded_body)
+                    except json.JSONDecodeError:
+                        error_detail = decoded_body
+                    else:
+                        fb_error = parsed.get("error", {})
+                        error_detail = (
+                            fb_error.get("error_user_msg")
+                            or fb_error.get("message")
+                            or decoded_body
+                        )
+            except Exception:
+                # If anything goes wrong while parsing the error payload, fallback to the
+                # default HTTP error message to avoid masking the original exception.
+                pass
+
+            raise RuntimeError(f"HTTP {exc.code}: {error_detail}") from exc
 
         return json.loads(payload)
 

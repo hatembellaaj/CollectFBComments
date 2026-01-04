@@ -11,6 +11,14 @@ from werkzeug.serving import generate_adhoc_ssl_context
 from collect_comments import CommentCollector, extract_post_id, save_comments_to_csv
 
 
+DEFAULT_FORM = {
+    "post_url": "https://www.facebook.com/Tunisie.Numerique",
+    "post_id": "118102328256809_1420505639435057",
+    "access_token": "EAAKD6HCLZADUBQc5Sb42f6631MSwGP7G6tc3NtyfNTqN3uTTwDiaqobfnZBs6XHXqYslLi0l8O4bNo8ZCxCFBXWIEhwBZAlOzPJTpYTLFwPK9DDEyFYjxOMtoLnbDBgb8NoIr3Mf8eEIxICcP8tmsWxhVvOV0m7q6CsoXOfFDQpiPKZCOk03kKr9bVpalKNReQo3WByh2HZA7slcjG55WXb5ZCmZBNM2ZCtptUyIaZA8gHUjGuRjUwcDMZD",
+    "api_version": "v24.0",
+}
+
+
 app = Flask(__name__)
 app.secret_key = "collect-fb-comments"
 
@@ -24,17 +32,19 @@ def home():
         csv_content=None,
         csv_name="comments.csv",
         comment_count=0,
-        form={"post_url": "", "access_token": "", "post_id": "", "api_version": "v19.0"},
+        form=DEFAULT_FORM,
     )
 
 
 @app.post("/")
 def collect_comments():
     form = {
-        "post_url": request.form.get("post_url", "").strip(),
-        "access_token": request.form.get("access_token", "").strip(),
-        "post_id": request.form.get("post_id", "").strip(),
-        "api_version": request.form.get("api_version", "v19.0").strip() or "v19.0",
+        "post_url": request.form.get("post_url", DEFAULT_FORM["post_url"]).strip() or DEFAULT_FORM["post_url"],
+        "access_token": request.form.get("access_token", DEFAULT_FORM["access_token"]).strip()
+        or DEFAULT_FORM["access_token"],
+        "post_id": request.form.get("post_id", DEFAULT_FORM["post_id"]).strip(),
+        "api_version": request.form.get("api_version", DEFAULT_FORM["api_version"]).strip()
+        or DEFAULT_FORM["api_version"],
     }
     csv_name = request.form.get("csv_name", "comments.csv").strip() or "comments.csv"
 

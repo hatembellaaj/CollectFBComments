@@ -38,6 +38,10 @@ flask run --host 0.0.0.0 --port 8060
 
 Ouvrez ensuite http://localhost:8060 et renseignez l'URL de la publication ainsi que votre jeton. Les 10 premiers commentaires sont affichés, et un bouton permet de télécharger le CSV généré.
 
+### Jetons d'accès
+
+Les jetons créés via le bouton « Generate Access Token » dans Graph API Explorer expirent vite. Pour limiter les renouvellements, générez un jeton longue durée depuis l'Explorer puis l'Access Token Debugger, et collez-le dans le formulaire de l'application lorsque le précédent expire. L'application ne gère pas automatiquement la création ou le rafraîchissement des jetons.
+
 Pour accepter des connexions HTTPS (utile si votre navigateur force le chiffrement), vous pouvez :
 
 - fournir vos propres fichiers de certificat et de clé via `SSL_CERT_FILE` et `SSL_KEY_FILE`, ou

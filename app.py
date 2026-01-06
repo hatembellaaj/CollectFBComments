@@ -14,7 +14,7 @@ from collect_comments import CommentCollector, extract_post_id, save_comments_to
 DEFAULT_FORM = {
     "post_url": "https://www.facebook.com/Tunisie.Numerique",
     "post_id": "118102328256809_1420505639435057",
-    "access_token": "EAAKD6HCLZADUBQc5Sb42f6631MSwGP7G6tc3NtyfNTqN3uTTwDiaqobfnZBs6XHXqYslLi0l8O4bNo8ZCxCFBXWIEhwBZAlOzPJTpYTLFwPK9DDEyFYjxOMtoLnbDBgb8NoIr3Mf8eEIxICcP8tmsWxhVvOV0m7q6CsoXOfFDQpiPKZCOk03kKr9bVpalKNReQo3WByh2HZA7slcjG55WXb5ZCmZBNM2ZCtptUyIaZA8gHUjGuRjUwcDMZD",
+    "access_token": "EAAKD6HCLZADUBQWgnPxQGOLtWPpabGX3hKW6QOwQ7kR81FsohhR2X4OItucjp3ZARaDZAALtQbJunIC16uPE7nwNKmWfTOKOtr0q3wudOXLI1gVmo0aMKGHZCsPlntUkON53GqBg8E1qzJvzw2Ki4DvAicPXuxmGsZBxhJHSbXEuVPE4jtaZCtsR9VaapghZCjiDKdAR7WqsJbHWQZDZD",
     "api_version": "v24.0",
 }
 
